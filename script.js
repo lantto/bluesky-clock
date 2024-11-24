@@ -10,13 +10,14 @@ const usedMessages = new Set();
 // Add this to track previous digits
 let previousDigits = ['', '', '', '', '', ''];
 
-function highlightNumber(text, number) {
+function highlightNumber(text, number, animate = false) {
     // Create both inline highlight and overlay number
     const highlightedText = text.replace(
         new RegExp(`\\b${number}\\b`),
         `<span class="number-inline">${number}</span>`
     );
-    return `<div class="number-overlay">${number}</div>${highlightedText}`;
+    const animateClass = animate ? ' animate' : '';
+    return `<div class="number-overlay${animateClass}">${number}</div>${highlightedText}`;
 }
 
 function getUnusedMessage(messages, digit) {
@@ -46,16 +47,23 @@ function updateClockDisplay() {
     digits.forEach((digit, index) => {
         const element = document.getElementById(slots[index]);
         const isCurrentlyEmpty = element.classList.contains('empty');
+        const digitChanged = digit !== previousDigits[index];
         
         // Update if the digit changed OR if the slot is empty
-        if (digit !== previousDigits[index] || isCurrentlyEmpty) {
+        if (digitChanged || isCurrentlyEmpty) {
             const messages = digitMessages[parseInt(digit)];
             const messageData = getUnusedMessage(messages, digit);
             
             if (messageData) {
+                // Only animate if the digit actually changed
+                const message = messageData.message.replace(
+                    /<div class="number-overlay[^>]*>/,
+                    `<div class="number-overlay${digitChanged ? ' animate' : ''}">`
+                );
+                
                 element.innerHTML = `
                     <div class="hologram">
-                        <div class="message-text">${messageData.message}</div>
+                        <div class="message-text">${message}</div>
                         <div class="lines"></div>
                     </div>
                 `;
@@ -71,7 +79,7 @@ function updateClockDisplay() {
             }
             
             // Update the previous digit only when it actually changes
-            if (digit !== previousDigits[index]) {
+            if (digitChanged) {
                 previousDigits[index] = digit;
             }
         }
@@ -92,7 +100,7 @@ ws.onmessage = (event) => {
         const numericMatch = text.match(/\b([0-9])\b/);
         if (numericMatch) {
             const number = parseInt(numericMatch[0]);
-            const highlightedText = highlightNumber(text, number);
+            const highlightedText = highlightNumber(text, number, true);
             // Only add the message if we don't have too many stored
             if (digitMessages[number].length < 1000) { // Prevent unlimited growth
                 digitMessages[number].push(highlightedText);
