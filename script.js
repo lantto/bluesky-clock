@@ -62,11 +62,20 @@ function updateClockDisplay() {
                 );
                 
                 element.innerHTML = `
-                    <div class="hologram">
+                    <div class="hologram${digitChanged ? ' scan' : ''}">
                         <div class="message-text">${message}</div>
                         <div class="lines"></div>
                     </div>
                 `;
+                
+                // Remove the scan class after animation completes
+                if (digitChanged) {
+                    const hologram = element.querySelector('.hologram');
+                    hologram.addEventListener('animationend', () => {
+                        hologram.classList.remove('scan');
+                    }, { once: true });
+                }
+                
                 element.classList.remove('empty');
             } else {
                 element.innerHTML = `
