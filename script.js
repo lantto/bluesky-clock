@@ -56,16 +56,16 @@ function updateClockDisplay() {
             
             if (messageData) {
                 // Only animate if the digit actually changed
-                const message = messageData.message.replace(
+                const message = messageData.message.message.replace(
                     /<div class="number-overlay[^>]*>/,
                     `<div class="number-overlay${digitChanged ? ' animate' : ''}">`
                 );
                 
                 element.innerHTML = `
-                    <div class="hologram${digitChanged ? ' scan' : ''}">
+                    <a href="${messageData.message.url}" target="_blank" class="hologram${digitChanged ? ' scan' : ''}">
                         <div class="message-text">${message}</div>
                         <div class="lines"></div>
-                    </div>
+                    </a>
                 `;
                 
                 // Remove the scan class after animation completes
@@ -110,9 +110,14 @@ ws.onmessage = (event) => {
         if (numericMatch) {
             const number = parseInt(numericMatch[0]);
             const highlightedText = highlightNumber(text, number, true);
-            // Only add the message if we don't have too many stored
-            if (digitMessages[number].length < 1000) { // Prevent unlimited growth
-                digitMessages[number].push(highlightedText);
+            const postUrl = `https://bsky.app/profile/${json.did}/post/${json.commit.rkey}`;
+            
+            // Store both the message and the URL
+            if (digitMessages[number].length < 1000) {
+                digitMessages[number].push({
+                    message: highlightedText,
+                    url: postUrl
+                });
             }
         }
     }

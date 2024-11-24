@@ -53,6 +53,8 @@
             box-shadow: 0 0 30px rgba(0,200,255,0.3);
             overflow: hidden;
             backdrop-filter: blur(5px);
+            text-decoration: none;
+            display: block;
         }
 
         .hologram::before {
@@ -209,6 +211,20 @@
 
         .number-overlay.animate {
             animation: fadeInOverlay 0.5s ease-out forwards;
+        }
+
+        a.hologram {
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        a.hologram:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 40px rgba(0,200,255,0.5);
+        }
+
+        a.hologram:active {
+            transform: scale(0.98);
         }
     </style>
 </head>
