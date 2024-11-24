@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .clock-container {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        .time-slot {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+        .time-slot.empty {
+            color: #999;
+            font-style: italic;
+        }
+        .number {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="clock-container">
+        <div id="hours1" class="time-slot empty">Waiting for message containing first hour digit...</div>
+        <div id="hours2" class="time-slot empty">Waiting for message containing second hour digit...</div>
+        <div id="minutes1" class="time-slot empty">Waiting for message containing first minute digit...</div>
+        <div id="minutes2" class="time-slot empty">Waiting for message containing second minute digit...</div>
+        <div id="seconds1" class="time-slot empty">Waiting for message containing first second digit...</div>
+        <div id="seconds2" class="time-slot empty">Waiting for message containing second second digit...</div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
