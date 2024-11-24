@@ -8,7 +8,12 @@ const digitMessages = {
 const usedMessages = new Set();
 
 function highlightNumber(text, number) {
-    return `<div class="number">${number}</div>${text}`;
+    // Create both inline highlight and overlay number
+    const highlightedText = text.replace(
+        new RegExp(`\\b${number}\\b`),
+        `<span class="number-inline">${number}</span>`
+    );
+    return `<div class="number-overlay">${number}</div>${highlightedText}`;
 }
 
 function getUnusedMessage(messages, digit) {
@@ -44,7 +49,7 @@ function updateClockDisplay() {
         if (messageData) {
             element.innerHTML = `
                 <div class="hologram">
-                    ${messageData.message}
+                    <div class="message-text">${messageData.message}</div>
                     <div class="lines"></div>
                 </div>
             `;
