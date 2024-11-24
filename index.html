@@ -2,34 +2,202 @@
 <html>
 <head>
     <style>
+        body {
+            background-color: #000;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Courier New', monospace;
+            perspective: 1000px;
+        }
+
         .clock-container {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 20px auto;
+            display: grid;
+            grid-template-columns: repeat(8, auto);
+            gap: 10px;
+            transform-style: preserve-3d;
+            animation: float 10s infinite ease-in-out;
         }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotateX(10deg); }
+            50% { transform: translateY(-20px) rotateX(5deg); }
+        }
+
         .time-slot {
-            margin: 10px 0;
-            padding: 10px;
-            background-color: #f0f0f0;
-            border-radius: 5px;
+            width: 180px;
+            height: 300px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
         }
-        .time-slot.empty {
-            color: #999;
-            font-style: italic;
+
+        .time-slot:hover {
+            transform: translateZ(50px);
         }
+
+        .hologram {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(165deg, 
+                rgba(0,100,255,0.1) 0%,
+                rgba(0,200,255,0.2) 40%, 
+                rgba(0,200,255,0.1) 60%,
+                rgba(0,100,255,0.1) 100%);
+            border: 2px solid rgba(0,200,255,0.3);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0,200,255,0.3);
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+        }
+
+        .hologram::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(0,200,255,0.4),
+                transparent
+            );
+            animation: scan 3s infinite linear;
+        }
+
+        @keyframes scan {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(300%); }
+        }
+
         .number {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 72px;
+            color: rgba(0,200,255,0.9);
+            text-shadow: 0 0 20px rgba(0,200,255,0.8);
+            z-index: 2;
+            font-family: 'Arial', sans-serif;
             font-weight: bold;
+        }
+
+        .message-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 15px;
+            box-sizing: border-box;
+            color: rgba(0,200,255,0.6);
+            font-size: 12px;
+            line-height: 1.4;
+            text-align: center;
+            overflow: hidden;
+            mask-image: linear-gradient(
+                to bottom,
+                transparent 0%,
+                black 20%,
+                black 80%,
+                transparent 100%
+            );
+            -webkit-mask-image: linear-gradient(
+                to bottom,
+                transparent 0%,
+                black 20%,
+                black 80%,
+                transparent 100%
+            );
+        }
+
+        .separator {
+            font-size: 72px;
+            color: rgba(0,200,255,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 0 0 20px rgba(0,200,255,0.5);
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .time-slot.empty .hologram {
+            opacity: 0.3;
+        }
+
+        .time-slot.empty .message-text {
+            color: rgba(0,200,255,0.3);
+        }
+
+        .lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,200,255,0.1) 3px,
+                transparent 4px
+            );
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
     <div class="clock-container">
-        <div id="hours1" class="time-slot empty">Waiting for message containing first hour digit...</div>
-        <div id="hours2" class="time-slot empty">Waiting for message containing second hour digit...</div>
-        <div id="minutes1" class="time-slot empty">Waiting for message containing first minute digit...</div>
-        <div id="minutes2" class="time-slot empty">Waiting for message containing second minute digit...</div>
-        <div id="seconds1" class="time-slot empty">Waiting for message containing first second digit...</div>
-        <div id="seconds2" class="time-slot empty">Waiting for message containing second second digit...</div>
+        <div id="hours1" class="time-slot empty">
+            <div class="hologram">
+                <div class="message-text">Awaiting transmission...</div>
+                <div class="lines"></div>
+            </div>
+        </div>
+        <div id="hours2" class="time-slot empty">
+            <div class="hologram">
+                <div class="message-text">Awaiting transmission...</div>
+                <div class="lines"></div>
+            </div>
+        </div>
+        <div class="separator">:</div>
+        <div id="minutes1" class="time-slot empty">
+            <div class="hologram">
+                <div class="message-text">Awaiting transmission...</div>
+                <div class="lines"></div>
+            </div>
+        </div>
+        <div id="minutes2" class="time-slot empty">
+            <div class="hologram">
+                <div class="message-text">Awaiting transmission...</div>
+                <div class="lines"></div>
+            </div>
+        </div>
+        <div class="separator">:</div>
+        <div id="seconds1" class="time-slot empty">
+            <div class="hologram">
+                <div class="message-text">Awaiting transmission...</div>
+                <div class="lines"></div>
+            </div>
+        </div>
+        <div id="seconds2" class="time-slot empty">
+            <div class="hologram">
+                <div class="message-text">Awaiting transmission...</div>
+                <div class="lines"></div>
+            </div>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>

@@ -1,32 +1,11 @@
 const url = "wss://jetstream2.us-east.bsky.network/subscribe?wantedCollections=app.bsky.feed.post&wantedCollections=app.bsky.feed.like";
 
-// Store messages for each digit
 const digitMessages = {
     0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: []
 };
 
-function getNumberFromWord(text) {
-    const numberWords = [
-        'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
-        'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 
-        'eighteen', 'nineteen', 'twenty', 'twenty-one', 'twenty-two', 'twenty-three', 'twenty-four'
-    ];
-    
-    const words = text.toLowerCase().match(/\b\w+(-\w+)?\b/g) || [];
-    for (const word of words) {
-        const index = numberWords.indexOf(word);
-        if (index !== -1) {
-            return { found: true, number: index, word };
-        }
-    }
-    return { found: false };
-}
-
-function highlightNumber(text, number, word = null) {
-    if (word) {
-        return text.replace(new RegExp(`\\b${word}\\b`, 'i'), `<span class="number">${word}</span>`);
-    }
-    return text.replace(new RegExp(`\\b${number}\\b`), `<span class="number">${number}</span>`);
+function highlightNumber(text, number) {
+    return `<div class="number">${number}</div>${text}`;
 }
 
 function updateClockDisplay() {
@@ -42,10 +21,20 @@ function updateClockDisplay() {
         
         if (messages.length > 0) {
             const latestMessage = messages[messages.length - 1];
-            element.innerHTML = latestMessage;
+            element.innerHTML = `
+                <div class="hologram">
+                    ${latestMessage}
+                    <div class="lines"></div>
+                </div>
+            `;
             element.classList.remove('empty');
         } else {
-            element.innerHTML = `Waiting for message containing ${digit}...`;
+            element.innerHTML = `
+                <div class="hologram">
+                    <div class="message-text">Awaiting transmission...</div>
+                    <div class="lines"></div>
+                </div>
+            `;
             element.classList.add('empty');
         }
     });
@@ -62,19 +51,11 @@ ws.onmessage = (event) => {
     if (json.commit?.collection === 'app.bsky.feed.post' && json.commit?.record?.text) {
         const text = json.commit.record.text;
         
-        // Check for numeric numbers 0-9
         const numericMatch = text.match(/\b([0-9])\b/);
         if (numericMatch) {
             const number = parseInt(numericMatch[0]);
             const highlightedText = highlightNumber(text, number);
             digitMessages[number].push(highlightedText);
-        }
-        
-        // Check for written numbers 0-9
-        const wordMatch = getNumberFromWord(text);
-        if (wordMatch.found && wordMatch.number <= 9) {
-            const highlightedText = highlightNumber(text, wordMatch.number, wordMatch.word);
-            digitMessages[wordMatch.number].push(highlightedText);
         }
     }
 };
@@ -87,5 +68,4 @@ ws.onclose = () => {
     console.log("WebSocket connection closed");
 };
 
-// Update clock display every second
 setInterval(updateClockDisplay, 1000);
