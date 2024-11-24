@@ -144,20 +144,20 @@ ws.onmessage = (event) => {
                     const unusedMessage = getUnusedMessage(digitMessages[number], number.toString());
                     
                     if (unusedMessage) {
-                        emptySlots.forEach(slotId => {
-                            const element = document.getElementById(slotId);
-                            element.innerHTML = `
-                                <a href="${unusedMessage.message.url}" target="_blank" class="hologram scan">
-                                    <div class="message-text">${unusedMessage.message.message}</div>
-                                    <div class="lines"></div>
-                                </a>
-                            `;
-                            
-                            const hologram = element.querySelector('.hologram');
-                            hologram.addEventListener('animationend', () => {
-                                hologram.classList.remove('scan');
-                            }, { once: true });
-                        });
+                        // Only update the first empty slot found
+                        const slotId = emptySlots[0];
+                        const element = document.getElementById(slotId);
+                        element.innerHTML = `
+                            <a href="${unusedMessage.message.url}" target="_blank" class="hologram scan">
+                                <div class="message-text">${unusedMessage.message.message}</div>
+                                <div class="lines"></div>
+                            </a>
+                        `;
+                        
+                        const hologram = element.querySelector('.hologram');
+                        hologram.addEventListener('animationend', () => {
+                            hologram.classList.remove('scan');
+                        }, { once: true });
                     }
                 }
             }
