@@ -137,6 +137,7 @@
                 black 80%,
                 transparent 100%
             );
+            transition: color 0.3s ease;
         }
 
         .separator {
@@ -191,6 +192,7 @@
             font-weight: bold;
             pointer-events: none;
             opacity: 0.7;
+            transition: opacity 0.2s ease;
         }
 
         .number-inline {
@@ -225,6 +227,7 @@
             font-weight: bold;
             pointer-events: none;
             opacity: 0.7;
+            transition: opacity 0.3s ease;
         }
 
         .number-overlay.animate {
@@ -267,6 +270,16 @@
             transform: none;
             box-shadow: 0 0 15px rgba(0,200,255,0.1);
             cursor: default;
+        }
+
+        .hologram:hover .message-text {
+            color: rgba(0,200,255,1);
+            mask-image: none;
+            -webkit-mask-image: none;
+        }
+
+        .hologram:hover .number-overlay {
+            opacity: 0 !important;
         }
 
         @media (max-width: 768px) {
