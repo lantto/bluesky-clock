@@ -7,6 +7,9 @@ const digitMessages = {
 // Keep track of all messages that have ever been displayed
 const usedMessages = new Set();
 
+// Add this to track previous digits
+let previousDigits = ['', '', '', '', '', ''];
+
 function highlightNumber(text, number) {
     // Create both inline highlight and overlay number
     const highlightedText = text.replace(
@@ -41,27 +44,36 @@ function updateClockDisplay() {
     const slots = ['hours1', 'hours2', 'minutes1', 'minutes2', 'seconds1', 'seconds2'];
     
     digits.forEach((digit, index) => {
-        const messages = digitMessages[parseInt(digit)];
         const element = document.getElementById(slots[index]);
+        const isCurrentlyEmpty = element.classList.contains('empty');
         
-        const messageData = getUnusedMessage(messages, digit);
-        
-        if (messageData) {
-            element.innerHTML = `
-                <div class="hologram">
-                    <div class="message-text">${messageData.message}</div>
-                    <div class="lines"></div>
-                </div>
-            `;
-            element.classList.remove('empty');
-        } else {
-            element.innerHTML = `
-                <div class="hologram">
-                    <div class="message-text">Awaiting new transmission...</div>
-                    <div class="lines"></div>
-                </div>
-            `;
-            element.classList.add('empty');
+        // Update if the digit changed OR if the slot is empty
+        if (digit !== previousDigits[index] || isCurrentlyEmpty) {
+            const messages = digitMessages[parseInt(digit)];
+            const messageData = getUnusedMessage(messages, digit);
+            
+            if (messageData) {
+                element.innerHTML = `
+                    <div class="hologram">
+                        <div class="message-text">${messageData.message}</div>
+                        <div class="lines"></div>
+                    </div>
+                `;
+                element.classList.remove('empty');
+            } else {
+                element.innerHTML = `
+                    <div class="hologram">
+                        <div class="message-text">Awaiting new transmission...</div>
+                        <div class="lines"></div>
+                    </div>
+                `;
+                element.classList.add('empty');
+            }
+            
+            // Update the previous digit only when it actually changes
+            if (digit !== previousDigits[index]) {
+                previousDigits[index] = digit;
+            }
         }
     });
 }
