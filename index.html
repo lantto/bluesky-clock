@@ -35,6 +35,9 @@
             gap: 10px;
             transform-style: preserve-3d;
             animation: float 10s infinite ease-in-out;
+            padding: 20px;
+            max-width: 100%;
+            overflow-x: hidden;
         }
 
         @keyframes float {
@@ -43,8 +46,8 @@
         }
 
         .time-slot {
-            width: 180px;
-            height: 300px;
+            width: clamp(100px, 15vw, 180px);
+            height: clamp(160px, 25vw, 300px);
             position: relative;
             transform-style: preserve-3d;
             transition: transform 0.5s ease;
@@ -116,7 +119,7 @@
             padding: 15px;
             box-sizing: border-box;
             color: rgba(0,200,255,0.6);
-            font-size: 12px;
+            font-size: clamp(10px, 1.5vw, 12px);
             line-height: 1.4;
             text-align: center;
             overflow: hidden;
@@ -137,7 +140,7 @@
         }
 
         .separator {
-            font-size: 72px;
+            font-size: clamp(36px, 6vw, 72px);
             color: rgba(0,200,255,0.5);
             display: flex;
             align-items: center;
@@ -180,7 +183,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 120px;
+            font-size: clamp(60px, 10vw, 120px);
             color: rgba(0,200,255,0.9);
             text-shadow: 0 0 20px rgba(0,200,255,0.8);
             z-index: 2;
@@ -264,6 +267,93 @@
             transform: none;
             box-shadow: 0 0 15px rgba(0,200,255,0.1);
             cursor: default;
+        }
+
+        @media (max-width: 768px) {
+            .clock-container {
+                grid-template-columns: auto auto;
+                grid-template-rows: repeat(3, auto);
+                gap: 10px;
+                width: 100%;
+                justify-content: center;
+                padding: 20px;
+            }
+
+            /* Hours row */
+            #hours1 { grid-column: 1; grid-row: 1; }
+            #hours2 { grid-column: 2; grid-row: 1; }
+            
+            /* Minutes row */
+            #minutes1 { grid-column: 1; grid-row: 2; }
+            #minutes2 { grid-column: 2; grid-row: 2; }
+            
+            /* Seconds row */
+            #seconds1 { grid-column: 1; grid-row: 3; }
+            #seconds2 { grid-column: 2; grid-row: 3; }
+
+            /* Hide separators on mobile */
+            .separator {
+                display: none;
+            }
+
+            .time-slot {
+                width: clamp(120px, 40vw, 160px);
+                height: clamp(160px, 50vw, 200px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .clock-container {
+                gap: 8px;
+                padding: 15px;
+                transform: rotateX(5deg);
+            }
+
+            .time-slot {
+                width: clamp(100px, 42vw, 120px);
+                height: clamp(140px, 52vw, 160px);
+            }
+
+            .message-text {
+                padding: 8px;
+                font-size: clamp(8px, 2.5vw, 10px);
+            }
+
+            .number-overlay {
+                font-size: clamp(40px, 12vw, 60px);
+            }
+
+            .number-inline {
+                font-size: 10px;
+                padding: 0 2px;
+                margin: 0 1px;
+            }
+
+            @keyframes float {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-5px); }
+            }
+        }
+
+        @media (max-width: 360px) {
+            .clock-container {
+                gap: 6px;
+                padding: 10px;
+            }
+
+            .time-slot {
+                width: clamp(80px, 42vw, 100px);
+                height: clamp(120px, 52vw, 140px);
+            }
+
+            .message-text {
+                padding: 5px;
+                font-size: clamp(7px, 2vw, 8px);
+            }
+
+            .number-overlay {
+                font-size: clamp(30px, 10vw, 40px);
+            }
         }
     </style>
 </head>
