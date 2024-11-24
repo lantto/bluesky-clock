@@ -4,8 +4,8 @@ const digitMessages = {
     0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: []
 };
 
-// Keep track of which messages are currently displayed
-const usedMessageIndices = new Set();
+// Keep track of all messages that have ever been displayed
+const usedMessages = new Set();
 
 function highlightNumber(text, number) {
     return `<div class="number">${number}</div>${text}`;
@@ -15,18 +15,17 @@ function getUnusedMessage(messages, digit) {
     // If we have no messages, return null
     if (messages.length === 0) return null;
     
-    // Try to find a message that isn't currently being used
+    // Try to find a message that has never been used before
     for (let i = messages.length - 1; i >= 0; i--) {
-        if (!usedMessageIndices.has(`${digit}-${i}`)) {
-            usedMessageIndices.add(`${digit}-${i}`);
+        const messageId = `${digit}-${i}`;
+        if (!usedMessages.has(messageId)) {
+            usedMessages.add(messageId);
             return { message: messages[i], index: i };
         }
     }
     
-    // If all messages are used, clear the used set and use the latest message
-    usedMessageIndices.clear();
-    usedMessageIndices.add(`${digit}-${messages.length - 1}`);
-    return { message: messages[messages.length - 1], index: messages.length - 1 };
+    // If all messages have been used, return null
+    return null;
 }
 
 function updateClockDisplay() {
@@ -35,9 +34,6 @@ function updateClockDisplay() {
     const digits = timeStr.substring(0, 6).split('');
     
     const slots = ['hours1', 'hours2', 'minutes1', 'minutes2', 'seconds1', 'seconds2'];
-    
-    // Clear the used messages set at the start of each update
-    usedMessageIndices.clear();
     
     digits.forEach((digit, index) => {
         const messages = digitMessages[parseInt(digit)];
@@ -56,7 +52,7 @@ function updateClockDisplay() {
         } else {
             element.innerHTML = `
                 <div class="hologram">
-                    <div class="message-text">Awaiting transmission...</div>
+                    <div class="message-text">Awaiting new transmission...</div>
                     <div class="lines"></div>
                 </div>
             `;
@@ -80,7 +76,10 @@ ws.onmessage = (event) => {
         if (numericMatch) {
             const number = parseInt(numericMatch[0]);
             const highlightedText = highlightNumber(text, number);
-            digitMessages[number].push(highlightedText);
+            // Only add the message if we don't have too many stored
+            if (digitMessages[number].length < 1000) { // Prevent unlimited growth
+                digitMessages[number].push(highlightedText);
+            }
         }
     }
 };
