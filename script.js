@@ -49,13 +49,12 @@ function updateClockDisplay() {
         const isCurrentlyEmpty = element.classList.contains('empty');
         const digitChanged = digit !== previousDigits[index];
         
-        // Update if the digit changed OR if the slot is empty
         if (digitChanged || isCurrentlyEmpty) {
             const messages = digitMessages[parseInt(digit)];
             const messageData = getUnusedMessage(messages, digit);
             
             if (messageData) {
-                // Only animate if the digit actually changed
+                // Has associated post - use clickable link version
                 const message = messageData.message.message.replace(
                     /<div class="number-overlay[^>]*>/,
                     `<div class="number-overlay${digitChanged ? ' animate' : ''}">`
@@ -67,25 +66,26 @@ function updateClockDisplay() {
                         <div class="lines"></div>
                     </a>
                 `;
-                
-                // Remove the scan class after animation completes
-                if (digitChanged) {
-                    const hologram = element.querySelector('.hologram');
-                    hologram.addEventListener('animationend', () => {
-                        hologram.classList.remove('scan');
-                    }, { once: true });
-                }
-                
-                element.classList.remove('empty');
             } else {
+                // No associated post - use non-clickable version with number overlay
                 element.innerHTML = `
-                    <div class="hologram">
-                        <div class="message-text">Awaiting new transmission...</div>
+                    <div class="hologram no-post">
+                        <div class="number-overlay${digitChanged ? ' animate' : ''}">${digit}</div>
+                        <div class="message-text">No transmission found...</div>
                         <div class="lines"></div>
                     </div>
                 `;
-                element.classList.add('empty');
             }
+            
+            // Remove the scan class after animation completes
+            if (digitChanged) {
+                const hologram = element.querySelector('.hologram');
+                hologram.addEventListener('animationend', () => {
+                    hologram.classList.remove('scan');
+                }, { once: true });
+            }
+            
+            element.classList.remove('empty');
             
             // Update the previous digit only when it actually changes
             if (digitChanged) {
@@ -100,6 +100,23 @@ ws.onopen = () => {
     console.log("Connected to Bluesky WebSocket");
 };
 
+// Add a function to find empty slots that need this digit
+function findEmptySlotsForDigit(digit) {
+    const now = new Date();
+    const timeStr = now.toTimeString().split(':').join('');
+    const currentDigits = timeStr.substring(0, 6).split('');
+    const slots = ['hours1', 'hours2', 'minutes1', 'minutes2', 'seconds1', 'seconds2'];
+    
+    return slots.reduce((emptySlots, slotId, index) => {
+        const element = document.getElementById(slotId);
+        if (currentDigits[index] === digit && element.querySelector('.hologram.no-post')) {
+            emptySlots.push(slotId);
+        }
+        return emptySlots;
+    }, []);
+}
+
+// Modify the WebSocket message handler
 ws.onmessage = (event) => {
     const json = JSON.parse(event.data);
     
@@ -114,10 +131,35 @@ ws.onmessage = (event) => {
             
             // Store both the message and the URL
             if (digitMessages[number].length < 1000) {
-                digitMessages[number].push({
+                const messageData = {
                     message: highlightedText,
                     url: postUrl
-                });
+                };
+                digitMessages[number].push(messageData);
+                
+                // Check if any current empty slots need this digit
+                const emptySlots = findEmptySlotsForDigit(number.toString());
+                if (emptySlots.length > 0) {
+                    // Get an unused message
+                    const unusedMessage = getUnusedMessage(digitMessages[number], number.toString());
+                    
+                    if (unusedMessage) {
+                        emptySlots.forEach(slotId => {
+                            const element = document.getElementById(slotId);
+                            element.innerHTML = `
+                                <a href="${unusedMessage.message.url}" target="_blank" class="hologram scan">
+                                    <div class="message-text">${unusedMessage.message.message}</div>
+                                    <div class="lines"></div>
+                                </a>
+                            `;
+                            
+                            const hologram = element.querySelector('.hologram');
+                            hologram.addEventListener('animationend', () => {
+                                hologram.classList.remove('scan');
+                            }, { once: true });
+                        });
+                    }
+                }
             }
         }
     }
