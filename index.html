@@ -321,6 +321,12 @@
             text-shadow: 0 0 5px rgba(0,200,255,0.5);
         }
 
+        .follow-hologram .handle {
+            color: rgba(0,255,255,1);
+            text-shadow: 0 0 8px rgba(0,255,255,0.8);
+            font-weight: bold;
+        }
+
         .follow-button:hover .follow-hologram {
             transform: scale(1.05);
             box-shadow: 0 0 25px rgba(0,200,255,0.5);
@@ -443,7 +449,7 @@
 <body>
     <a href="https://bsky.app/profile/lantto.bsky.social" target="_blank" class="follow-button">
         <div class="follow-hologram">
-            <span>made by @lantto.bsky.social</span>
+            <span>made by <strong class="handle">@lantto.bsky.social</strong></span>
             <div class="lines"></div>
         </div>
     </a>
