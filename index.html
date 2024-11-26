@@ -291,6 +291,45 @@
             opacity: 0 !important;
         }
 
+        .follow-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        .follow-hologram {
+            padding: 8px 15px;
+            background: linear-gradient(165deg, 
+                rgba(0,100,255,0.1) 0%,
+                rgba(0,200,255,0.2) 40%, 
+                rgba(0,200,255,0.1) 60%,
+                rgba(0,100,255,0.1) 100%);
+            border: 2px solid rgba(0,200,255,0.3);
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,200,255,0.3);
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .follow-hologram span {
+            color: rgba(0,200,255,0.8);
+            font-size: 14px;
+            text-shadow: 0 0 5px rgba(0,200,255,0.5);
+        }
+
+        .follow-button:hover .follow-hologram {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(0,200,255,0.5);
+        }
+
+        .follow-button:active .follow-hologram {
+            transform: scale(0.95);
+        }
+
         @media (max-width: 768px) {
             .clock-container {
                 grid-template-columns: auto auto;
@@ -321,6 +360,19 @@
             .time-slot {
                 width: clamp(120px, 40vw, 160px);
                 height: clamp(160px, 50vw, 200px);
+            }
+
+            .follow-button {
+                top: 10px;
+                right: 10px;
+            }
+
+            .follow-hologram {
+                padding: 6px 12px;
+            }
+
+            .follow-hologram span {
+                font-size: 12px;
             }
         }
 
@@ -355,6 +407,15 @@
                 0%, 100% { transform: translateY(0); }
                 50% { transform: translateY(-5px); }
             }
+
+            .follow-button {
+                top: 5px;
+                right: 5px;
+            }
+
+            .follow-hologram span {
+                font-size: 10px;
+            }
         }
 
         @media (max-width: 360px) {
@@ -380,6 +441,12 @@
     </style>
 </head>
 <body>
+    <a href="https://bsky.app/profile/lantto.bsky.social" target="_blank" class="follow-button">
+        <div class="follow-hologram">
+            <span>made by @lantto.bsky.social</span>
+            <div class="lines"></div>
+        </div>
+    </a>
     <div class="clock-container">
         <div id="hours1" class="time-slot empty">
             <div class="hologram">
